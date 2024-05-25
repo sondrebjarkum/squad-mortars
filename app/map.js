@@ -4,8 +4,20 @@ import L, { LatLng } from 'leaflet';
 import { Layers } from './constants/layers';
 
 export class SquadMap {
+  tileSize = 256;
+
   constructor({ handleContextMenu, handleDoubleClick, handleMouseOut }) {
     this.map = this.init(handleContextMenu, handleDoubleClick, handleMouseOut);
+    this.map.addEventListener('layeradd', (e) => console.log('added layer', e));
+    this.map.addEventListener('layerremove', (e) => {
+      console.log('layerremove', e);
+      const { id, instanceName } = e.layer.options;
+      document.dispatchEvent(
+        new CustomEvent('layerremove', {
+          detail: { event: e, id, instanceName },
+        }),
+      );
+    });
   }
 
   createLayer(layer) {
@@ -29,13 +41,17 @@ export class SquadMap {
     this.map.addLayer(tileLayer);
   }
 
+  addMarker(marker) {
+    return L.marker(marker._latlng, marker.options).addTo(this.map);
+  }
+
   init(handleContextMenu, handleDoubleClick, handleMouseOut) {
     const activeMap = this.getLayer();
 
     const tileLayer = this.createLayer(activeMap);
 
     const map = L.map('map', {
-      center: new LatLng(-256 / 2, 256 / 2),
+      center: new LatLng(-this.tileSize / 2, this.tileSize / 2),
       attributionControl: false,
       crs: L.CRS.Simple,
       minZoom: 1,

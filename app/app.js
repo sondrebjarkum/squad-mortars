@@ -7,40 +7,67 @@ import { Target } from './target';
  */
 
 class AppBase {
+  /** @type {SquadMap} */
   map;
   mortar;
   targets = [];
 
-  constructor() {}
+  constructor() {
+    this.registerListeners();
+  }
 
   init() {
     this.map = new SquadMap({
-      handleContextMenu: (e) => console.log(e),
-      handleDoubleClick: (e) => {
-        this.addMarker(e);
-        console.log('mortar', this.mortar);
-        console.log('targets', this.targets);
-      },
+      handleContextMenu: (e) => this.handleContextMenu(e),
+      handleDoubleClick: (e) => this.addMarker(e),
       handleMouseOut: () => null,
     });
   }
 
-  setMortar(lat, lng) {
-    this.mortar = new Mortar(lat, lng);
-  }
+  registerListeners() {
+    document.addEventListener('layerremove', (e) => {
+      console.log('WERE LISTENING BBY:', e);
 
-  addTarget(lat, lng) {
-    this.targets.push(new Target(lat, lng, this.mortar));
+      const { id, instanceName } = e.detail;
+
+      if (instanceName === 'Mortar') {
+        this.mortar = undefined;
+      }
+
+      if (instanceName === 'Target') {
+        this.targets = this.targets.filter(
+          (target) => target.options.id !== id,
+        );
+      }
+
+      console.log('targets', this.targets);
+      console.log('mortar', this.mortar);
+    });
   }
 
   addMarker(e) {
-    const { lat, lng } = e.latlng;
-
     if (!this.mortar) {
-      return this.setMortar(lat, lng);
+      return this.addMortar(e.latlng);
     }
 
-    return this.addTarget(lat, lng);
+    return this.addTarget(e.latlng);
+  }
+
+  addMortar(latlng) {
+    const mortar = new Mortar(latlng, this.map);
+    this.mortar = mortar;
+  }
+
+  addTarget(latlng) {
+    const target = new Target(latlng, this.map);
+    this.targets.push(target);
+    console.log('this.targets:', this.targets);
+  }
+
+  handleContextMenu(e) {
+    console.log('e:', e);
+    // if instance of Target - delete target
+    // if instance of Mortar - context menu? with delete etc
   }
 }
 

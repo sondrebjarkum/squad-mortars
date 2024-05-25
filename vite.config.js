@@ -4,5 +4,4 @@ import eslint from 'vite-plugin-eslint';
 export default defineConfig({
   root: 'app',
   plugins: [eslint({ exclude: [/node_modules/], failOnError: false })],
-
 });

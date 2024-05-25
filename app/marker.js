@@ -1,4 +1,5 @@
 import L from 'leaflet';
+import autoBind from './helpers/auto-bind';
 
 export default class MarkerBase extends L.Marker {
   options = {
@@ -6,33 +7,57 @@ export default class MarkerBase extends L.Marker {
     riseOnHover: true,
     keyboard: false,
     animate: true,
+    id: Math.random().toString(16).slice(2),
+    instanceName: this.constructor.name,
   };
 
-  constructor(latlng, options, map) {
+  /**
+   *
+   * @param {L.LatLng} latlng
+   * @param {import("./map").SquadMap} map
+   * @param {L.MarkerOptions} options
+   */
+  constructor(latlng, map, options) {
     super(latlng, options);
-    this.map = map;
+    // this.markerId = Math.random().toString(16).slice(2);
+    this.instanceName = this.constructor.name;
+    this.latlng = latlng;
+    this.squadMap = map;
     this.id = Math.random().toString(16).slice(2);
+
     this.on('dragstart', this._handleDragStart, this);
     this.on('dragend', this._handleDragEnd, this);
+    // this.on('click', (e) => console.log('dbclick', e));
+
+    autoBind(this);
+  }
+
+  /**
+   *
+   * @param {L.Marker} marker
+   */
+  addToMap(marker) {
+    if (this.outOfBounds(marker)) return;
+    return this.squadMap.addMarker(marker);
   }
 
   /**
    * Force a given event to stay inside the map bounds
    */
-  keepOnMap(event) {
-    if (event.latlng.lng > this.map.tilesSize) {
-      event.latlng.lng = this.map.tilesSize;
-    }
-    if (event.latlng.lat < -this.map.tilesSize) {
-      event.latlng.lat = -this.map.tilesSize;
-    }
-    if (event.latlng.lng < 0) {
-      event.latlng.lng = 0;
-    }
-    if (event.latlng.lat > 0) {
-      event.latlng.lat = 0;
-    }
-    return event;
+  outOfBounds(event) {
+    return (
+      event.latlng.lng > this.squadMap.tileSize ||
+      event.latlng.lat < -this.squadMap.tileSize ||
+      event.latlng.lng < 0 ||
+      event.latlng.lat > 0
+    );
+  }
+
+  createIcon(url, opts = {}) {
+    return L.icon({
+      iconUrl: url,
+      ...opts,
+    });
   }
 
   _handleDragStart() {
