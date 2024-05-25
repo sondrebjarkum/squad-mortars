@@ -1,56 +1,49 @@
 import { SquadMap } from './map';
+import { Mortar } from './mortar';
+import { Target } from './target';
+
+/**
+ * App logic
+ */
 
 class AppBase {
   map;
   mortar;
-  targets;
+  targets = [];
 
   constructor() {}
 
   init() {
-    this.map = new SquadMap();
+    this.map = new SquadMap({
+      handleContextMenu: (e) => console.log(e),
+      handleDoubleClick: (e) => {
+        this.addMarker(e);
+        console.log('mortar', this.mortar);
+        console.log('targets', this.targets);
+      },
+      handleMouseOut: () => null,
+    });
   }
 
   setMortar(lat, lng) {
     this.mortar = new Mortar(lat, lng);
-  }
-
-  addTarget(lat, lng) {
-    this.targets.push(new Target(lat, lng));
-  }
-}
-
-const App = new AppBase();
-
-export default App;
-
-export class Mortar {
-  constructor(lat, lng) {
-    this.lat = lat;
-    this.lng = lng;
-  }
-
-  setMortar(lat, lng) {
-    this.mortar = new Mortar(lat, lng);
-  }
-}
-
-export class Target {
-  constructor(lat, lng, mortar) {
-    this.lat = lat;
-    this.lng = lng;
-    this.id = Math.floor(Math.random() * 10000);
-    this.mortar = mortar;
   }
 
   addTarget(lat, lng) {
     this.targets.push(new Target(lat, lng, this.mortar));
   }
 
-  removeTarget(id) {
-    this.targets = this.targets.filter((target) => target.id !== id);
-  }
+  addMarker(e) {
+    const { lat, lng } = e.latlng;
 
-  // har ref til mortaren i targeten
-  // når mortar flytter seg, må jeg update calculations i target
+    if (!this.mortar) {
+      return this.setMortar(lat, lng);
+    }
+
+    return this.addTarget(lat, lng);
+  }
 }
+
+const App = new AppBase();
+
+export default App;

@@ -1,11 +1,11 @@
 import './styles/style.css';
 import 'leaflet/dist/leaflet.css';
 import L, { LatLng } from 'leaflet';
-import { Layers } from './constants/maps';
+import { Layers } from './constants/layers';
 
 export class SquadMap {
-  constructor() {
-    this.map = this.init();
+  constructor({ handleContextMenu, handleDoubleClick, handleMouseOut }) {
+    this.map = this.init(handleContextMenu, handleDoubleClick, handleMouseOut);
   }
 
   createLayer(layer) {
@@ -29,7 +29,7 @@ export class SquadMap {
     this.map.addLayer(tileLayer);
   }
 
-  init() {
+  init(handleContextMenu, handleDoubleClick, handleMouseOut) {
     const activeMap = this.getLayer();
 
     const tileLayer = this.createLayer(activeMap);
@@ -56,8 +56,44 @@ export class SquadMap {
       })
       .addTo(map);
 
+    // map.on('click', (e) => {
+    //   const { lat, lng } = e.latlng;
+    //   L.marker([lat, lng]).addTo(map);
+    // });
+
+    map.on('dblclick', handleDoubleClick, this);
+    map.on('contextmenu', handleContextMenu, this);
+    map.on('mouseout', handleMouseOut, this);
+
     return map;
   }
+
+  // _handleContextMenu(handler) {
+  //   // If out of bounds
+  //   // if (
+  //   //   e.latlng.lat > 0 ||
+  //   //   e.latlng.lat < -this.tilesSize ||
+  //   //   e.latlng.lng < 0 ||
+  //   //   e.latlng.lng > this.tilesSize
+  //   // ) {
+  //   //   return 1;
+  //   // }
+
+  //   if (this.activeWeaponsMarkers.getLayers().length === 0) {
+  //     new squadWeaponMarker(e.latlng, { icon: mortarIcon }, this)
+  //       .addTo(this.markersGroup)
+  //       .addTo(this.activeWeaponsMarkers);
+  //     return 0;
+  //   } else {
+  //     if (this.activeWeaponsMarkers.getLayers().length === 1) {
+  //       new squadWeaponMarker(e.latlng, { icon: mortarIcon2 }, this)
+  //         .addTo(this.markersGroup)
+  //         .addTo(this.activeWeaponsMarkers);
+  //       this.activeWeaponsMarkers.getLayers()[0].setIcon(mortarIcon1);
+  //       this.updateTargets();
+  //     }
+  //   }
+  // }
 }
 
 // const getMapConfig = (tilesSize, id = 'map') => {
