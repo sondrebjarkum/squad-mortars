@@ -19,7 +19,6 @@ export default class MarkerBase extends L.Marker {
    */
   constructor(latlng, map, options) {
     super(latlng, options);
-    // this.markerId = Math.random().toString(16).slice(2);
     this.instanceName = this.constructor.name;
     this.latlng = latlng;
     this.squadMap = map;

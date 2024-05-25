@@ -6,18 +6,18 @@ import { Layers } from './constants/layers';
 export class SquadMap {
   tileSize = 256;
 
-  constructor({ handleContextMenu, handleDoubleClick, handleMouseOut }) {
-    this.map = this.init(handleContextMenu, handleDoubleClick, handleMouseOut);
-    this.map.addEventListener('layeradd', (e) => console.log('added layer', e));
-    this.map.addEventListener('layerremove', (e) => {
-      console.log('layerremove', e);
-      const { id, instanceName } = e.layer.options;
-      document.dispatchEvent(
-        new CustomEvent('layerremove', {
-          detail: { event: e, id, instanceName },
-        }),
-      );
-    });
+  constructor({
+    handleContextMenu,
+    handleDoubleClick,
+    handleMouseOut,
+    handleLayerRemove,
+  }) {
+    this.map = this.init(
+      handleContextMenu,
+      handleDoubleClick,
+      handleMouseOut,
+      handleLayerRemove,
+    );
   }
 
   createLayer(layer) {
@@ -45,7 +45,12 @@ export class SquadMap {
     return L.marker(marker._latlng, marker.options).addTo(this.map);
   }
 
-  init(handleContextMenu, handleDoubleClick, handleMouseOut) {
+  init(
+    handleContextMenu,
+    handleDoubleClick,
+    handleMouseOut,
+    handleLayerRemove,
+  ) {
     const activeMap = this.getLayer();
 
     const tileLayer = this.createLayer(activeMap);
@@ -80,6 +85,7 @@ export class SquadMap {
     map.on('dblclick', handleDoubleClick, this);
     map.on('contextmenu', handleContextMenu, this);
     map.on('mouseout', handleMouseOut, this);
+    map.addEventListener('layerremove', handleLayerRemove);
 
     return map;
   }

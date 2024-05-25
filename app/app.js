@@ -21,29 +21,11 @@ class AppBase {
       handleContextMenu: (e) => this.handleContextMenu(e),
       handleDoubleClick: (e) => this.addMarker(e),
       handleMouseOut: () => null,
+      handleLayerRemove: (e) => this.handleLayerRemove(e),
     });
   }
 
-  registerListeners() {
-    document.addEventListener('layerremove', (e) => {
-      console.log('WERE LISTENING BBY:', e);
-
-      const { id, instanceName } = e.detail;
-
-      if (instanceName === 'Mortar') {
-        this.mortar = undefined;
-      }
-
-      if (instanceName === 'Target') {
-        this.targets = this.targets.filter(
-          (target) => target.options.id !== id,
-        );
-      }
-
-      console.log('targets', this.targets);
-      console.log('mortar', this.mortar);
-    });
-  }
+  registerListeners() {}
 
   addMarker(e) {
     if (!this.mortar) {
@@ -65,9 +47,19 @@ class AppBase {
   }
 
   handleContextMenu(e) {
-    console.log('e:', e);
-    // if instance of Target - delete target
-    // if instance of Mortar - context menu? with delete etc
+    // kan vise en generell context menu, med add mortar, target, etc?
+  }
+
+  handleLayerRemove(e) {
+    const { id, instanceName } = e.layer.options;
+
+    if (instanceName === 'Mortar') {
+      this.mortar = undefined;
+    }
+
+    if (instanceName === 'Target') {
+      this.targets = this.targets.filter((target) => target.options.id !== id);
+    }
   }
 }
 
