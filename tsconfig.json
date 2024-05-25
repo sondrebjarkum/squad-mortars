@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "checkJs": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": false,
+    // "baseUrl": ".",
+    "outDir": "./dist",
+    // "paths": {
+    //   "@/*": [
+    //     "src/*"
+    //   ]
+    // }
+  },
+  "include": [
+    "app/**/*.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "./dist/**/*"
+  ]
+}
