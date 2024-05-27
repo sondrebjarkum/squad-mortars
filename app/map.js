@@ -5,6 +5,7 @@ import { Layers } from './constants/layers';
 
 export class SquadMap {
   tileSize = 256;
+  layer;
 
   constructor({
     handleContextMenu,
@@ -12,12 +13,15 @@ export class SquadMap {
     handleMouseOut,
     handleLayerRemove,
   }) {
-    this.map = this.init(
+    this.init(
       handleContextMenu,
       handleDoubleClick,
       handleMouseOut,
       handleLayerRemove,
     );
+
+    this.gameToMapScale = this.tileSize / this.layer.size;
+    this.mapToGameScale = this.layer.size / this.tileSize;
   }
 
   createLayer(layer) {
@@ -27,6 +31,10 @@ export class SquadMap {
     );
   }
 
+  getActiveLayer() {
+    return this.map;
+  }
+
   getLayer(layerName) {
     return layerName
       ? Layers.find((layer) => layer.name === layerName)
@@ -34,11 +42,12 @@ export class SquadMap {
   }
 
   setLayer(layerName) {
-    const activeMap = this.getLayer(layerName);
-    const tileLayer = this.createLayer(activeMap);
+    const activeLayer = this.getLayer(layerName);
+    const tileLayer = this.createLayer(activeLayer);
 
     this.map.eachLayer((layer) => this.map.removeLayer(layer));
     this.map.addLayer(tileLayer);
+    this.layer = activeLayer;
   }
 
   addMarker(marker) {
@@ -51,11 +60,11 @@ export class SquadMap {
     handleMouseOut,
     handleLayerRemove,
   ) {
-    const activeMap = this.getLayer();
+    // const activeMap = this.getLayer();
 
-    const tileLayer = this.createLayer(activeMap);
+    // const tileLayer = this.createLayer(activeMap);
 
-    const map = L.map('map', {
+    this.map = L.map('map', {
       center: new LatLng(-this.tileSize / 2, this.tileSize / 2),
       attributionControl: false,
       crs: L.CRS.Simple,
@@ -68,26 +77,22 @@ export class SquadMap {
       boxZoom: true,
       fadeAnimation: true,
       zoom: 2,
-      layers: [tileLayer],
+      // layers: [tileLayer],
     });
 
     L.control
       .scale({
         imperial: false,
       })
-      .addTo(map);
+      .addTo(this.map);
+    this.setLayer(this.getLayer().name);
 
-    // map.on('click', (e) => {
-    //   const { lat, lng } = e.latlng;
-    //   L.marker([lat, lng]).addTo(map);
-    // });
+    this.map.on('dblclick', handleDoubleClick, this);
+    this.map.on('contextmenu', handleContextMenu, this);
+    this.map.on('mouseout', handleMouseOut, this);
+    this.map.addEventListener('layerremove', handleLayerRemove);
 
-    map.on('dblclick', handleDoubleClick, this);
-    map.on('contextmenu', handleContextMenu, this);
-    map.on('mouseout', handleMouseOut, this);
-    map.addEventListener('layerremove', handleLayerRemove);
-
-    return map;
+    return this.map;
   }
 
   // _handleContextMenu(handler) {

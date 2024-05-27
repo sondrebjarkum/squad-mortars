@@ -36,8 +36,47 @@ h1 {
   align-items: center;
 }
 
-main .container{
+main .container {
   width: 100%;
   height: 100vh;
 }
 
+.calcPopup,
+.calcPopup2 {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  pointer-events: none;
+  font-weight: bold;
+  font-size: 0.9em;
+  color: black;
+  height: 45px;
+  .bearingUiCalc {
+    font-size: 0.7em;
+  }
+  .leaflet-popup-tip,
+  .leaflet-popup-content-wrapper {
+    background: transparent;
+    box-shadow: none;
+    color: black;
+  }
+  .leaflet-popup-content {
+    margin: 0;
+    line-height: 1;
+  }
+  .leaflet-popup-tip-container {
+    display: none;
+  }
+  &.calcPopup {
+    .leaflet-popup-content-wrapper {
+      text-align: right;
+    }
+  }
+  &.calcPopup2 {
+    .leaflet-popup-content-wrapper {
+      text-align: left;
+    }
+  }
+}

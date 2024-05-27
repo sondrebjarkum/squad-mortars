@@ -1,3 +1,4 @@
+import { Weapons } from './constants/weapons';
 import { SquadMap } from './map';
 import { Mortar } from './mortar';
 import { Target } from './target';
@@ -9,8 +10,16 @@ import { Target } from './target';
 class AppBase {
   /** @type {SquadMap} */
   map;
+  /** @type {Mortar} */
   mortar;
+  /** @type {Target[]} */
   targets = [];
+
+  config = {
+    gravity: 9.8,
+    mapSize: 255,
+    activeWeapon: Weapons[0],
+  };
 
   constructor() {
     this.registerListeners();
@@ -51,7 +60,7 @@ class AppBase {
   }
 
   handleLayerRemove(e) {
-    const { id, instanceName } = e.layer.options;
+    const { id = undefined, instanceName = '' } = e.layer.options;
 
     if (instanceName === 'Mortar') {
       this.mortar = undefined;

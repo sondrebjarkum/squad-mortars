@@ -29,6 +29,10 @@ export default class MarkerBase extends L.Marker {
     // this.on('click', (e) => console.log('dbclick', e));
 
     autoBind(this);
+    console.log('this.options.instanceName:', this.options.instanceName);
+    document.dispatchEvent(
+      new CustomEvent('created#' + this.options.instanceName),
+    );
   }
 
   /**
@@ -36,20 +40,37 @@ export default class MarkerBase extends L.Marker {
    * @param {L.Marker} marker
    */
   addToMap(marker) {
-    if (this.outOfBounds(marker)) return;
+    if (this.outOfBounds(marker.getLatLng())) return;
     return this.squadMap.addMarker(marker);
   }
 
   /**
    * Force a given event to stay inside the map bounds
    */
-  outOfBounds(event) {
+  outOfBounds(latlng) {
     return (
-      event.latlng.lng > this.squadMap.tileSize ||
-      event.latlng.lat < -this.squadMap.tileSize ||
-      event.latlng.lng < 0 ||
-      event.latlng.lat > 0
+      latlng.lng > this.squadMap.tileSize ||
+      latlng.lat < -this.squadMap.tileSize ||
+      latlng.lng < 0 ||
+      latlng.lat > 0
     );
+  }
+
+  keepOnMap(e) {
+    const { tileSize } = this.squadMap;
+    if (e.latlng.lng > tileSize) {
+      e.latlng.lng = tileSize;
+    }
+    if (e.latlng.lat < -tileSize) {
+      e.latlng.lat = -tileSize;
+    }
+    if (e.latlng.lng < 0) {
+      e.latlng.lng = 0;
+    }
+    if (e.latlng.lat > 0) {
+      e.latlng.lat = 0;
+    }
+    return e;
   }
 
   createIcon(url, opts = {}) {
