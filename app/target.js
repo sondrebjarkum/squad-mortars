@@ -129,10 +129,10 @@ export class Target extends MarkerBase {
     this.recalculate();
   }
 
-  recalculate(latlng) {
+  recalculate() {
     // må sjekke om mortar har blitt removed
     // om så, må jeg fjerne alt av radius calcs, og neste gang en mortar lages rekalkulere
-    if (!latlng) {
+    if (!this.latlng) {
       // remove the radius circles
       // and calculations
     }
@@ -215,7 +215,8 @@ export class Target extends MarkerBase {
 
   setProperties() {
     // weaponPos = this.map.activeWeaponsMarkers.getLayers()[0].getLatLng();
-    const weaponPos = App.mortar.latlng;
+    const weaponPos = App.mortar?.latlng || { lat: 0, lng: 0 };
+
     // weaponHeight = this._map.heightmap.getHeight(weaponPos);
     const weaponHeight = 1;
     // targetHeight = this._map.heightmap.getHeight(latlng);
@@ -248,6 +249,8 @@ export class Target extends MarkerBase {
       targetHeight,
       gravityScale: App.config.activeWeapon.gravityScale,
     };
+
+    console.log(this.properties);
   }
 
   setCalculations() {
@@ -277,7 +280,7 @@ export class Target extends MarkerBase {
 //   if (!this.instances.calcMarker || !this.instances.spreadMarker) {
 //     for (const [k, circle] of Object.entries(this.instances)) {
 //       if (k === 'self') return;
-//       this.squadMap.map.removeLayer(circle);
+//       this.squadMap.layer.removeLayer(circle);
 //     }
 //   }
 //   // var angleElipse;
@@ -293,12 +296,12 @@ export class Target extends MarkerBase {
 //   const targetHeight = 1;
 
 //   const a = L.latLng([
-//     weaponPos.lng * this.squadMap.mapToGameScale,
-//     -weaponPos.lat * this.squadMap.mapToGameScale,
+//     weaponPos.lng * this.squadMap.layerToGameScale,
+//     -weaponPos.lat * this.squadMap.layerToGameScale,
 //   ]);
 //   const b = L.latLng([
-//     this.latlng.lng * this.squadMap.mapToGameScale,
-//     -this.latlng.lat * this.squadMap.mapToGameScale,
+//     this.latlng.lng * this.squadMap.layerToGameScale,
+//     -this.latlng.lat * this.squadMap.layerToGameScale,
 //   ]);
 
 //   const distance = getDist(a, b);
@@ -328,15 +331,15 @@ export class Target extends MarkerBase {
 
 //   this.instances.calcMarker = L.popup(this.targetPopupStyle)
 //     .setLatLng(this.latlng)
-//     .openOn(this.squadMap.map)
-//     .addTo(this.squadMap.map);
+//     .openOn(this.squadMap.layer)
+//     .addTo(this.squadMap.layer);
 
 //   this.instances.spreadMarker = new Ellipse(
 //     this.latlng,
 //     this.calculations.radiiElipse,
 //     this.options.results.bearing,
 //     this.spreadMarkerStyle,
-//   ).addTo(this.squadMap.map);
+//   ).addTo(this.squadMap.layer);
 
 //   this.instances.spreadMarker.setRadius([
 //     (this.options.results.spreadParameters.semiMajorAxis *

@@ -9,7 +9,7 @@ import { Layers } from '../constants/layers';
  * @param {string} kp - keypad coordinates, e.g. "A02-3-5-2"
  * @returns {L.LatLng} converted coordinates
  */
-function getPos(kp) {
+export function getPos(kp) {
   const FORMATTED_KEYPAD = formatKeyPad(kp);
   const PARTS = FORMATTED_KEYPAD.split('-');
   var interval;
@@ -31,13 +31,12 @@ function getPos(kp) {
     } else {
       // opposite of calculations in getKP()
       const SUB = Number(PARTS[i]);
-      if (!App.debug.active && Number.isNaN(SUB)) {
-        console.log(`invalid keypad string: ${FORMATTED_KEYPAD}`);
-      }
+
       const subX = (SUB - 1) % 3;
       const subY = 2 - (Math.ceil(SUB / 3) - 1);
 
       interval = 300 / 3 ** i;
+      console.log('interval:', interval);
       lat += interval * subX;
       lng += interval * subY;
     }
@@ -779,6 +778,76 @@ export function isMultiple(a, b) {
 }
 
 /**
+ * Converts keypad coordinates back to latitude and longitude.
+ * @param keypad - keypad coordinates as string (e.g. "A5-3-7")
+ * @returns {Object} Object containing latitude and longitude
+ */
+export function getLatLng(keypad) {
+  const kp = 300 / 3 ** 0; // interval of main keypad, e.g "A5"
+  const s1 = 300 / 3 ** 1; // interval of first sub keypad
+  const s2 = 300 / 3 ** 2; // interval of second sub keypad
+  const s3 = 300 / 3 ** 3; // interval of third sub keypad
+  const s4 = 300 / 3 ** 4; // interval of fourth sub keypad
+
+  // Split the keypad coordinates
+  const parts = keypad.split('-');
+  const mainKeypad = parts[0];
+  const sub1 = parts.length > 1 ? parseInt(parts[1], 10) : null;
+  const sub2 = parts.length > 2 ? parseInt(parts[2], 10) : null;
+  const sub3 = parts.length > 3 ? parseInt(parts[3], 10) : null;
+  const sub4 = parts.length > 4 ? parseInt(parts[4], 10) : null;
+
+  // Main keypad calculations
+  const kpLetter = mainKeypad[0];
+  const kpNumber = parseInt(mainKeypad.slice(1), 10);
+
+  const kpCharCode = kpLetter.charCodeAt(0);
+  const xMain =
+    (kpCharCode >= 97 ? kpCharCode - 97 + 26 : kpCharCode - 65) * kp;
+  const yMain = (kpNumber - 1) * kp;
+
+  let x = xMain;
+  let y = yMain;
+
+  // Sub keypad 1 calculations
+  if (sub1 !== null) {
+    const sub1X = (sub1 - 1) % 3;
+    const sub1Y = Math.floor((10 - sub1) / 3);
+    x += sub1X * s1;
+    y += sub1Y * s1;
+  }
+
+  // Sub keypad 2 calculations
+  if (sub2 !== null) {
+    const sub2X = (sub2 - 1) % 3;
+    const sub2Y = Math.floor((10 - sub2) / 3);
+    x += sub2X * s2;
+    y += sub2Y * s2;
+  }
+
+  // Sub keypad 3 calculations
+  if (sub3 !== null) {
+    const sub3X = (sub3 - 1) % 3;
+    const sub3Y = Math.floor((10 - sub3) / 3);
+    x += sub3X * s3;
+    y += sub3Y * s3;
+  }
+
+  // Sub keypad 4 calculations
+  if (sub4 !== null) {
+    const sub4X = (sub4 - 1) % 3;
+    const sub4Y = Math.floor((10 - sub4) / 3);
+    x += sub4X * s4;
+    y += sub4Y * s4;
+  }
+
+  return {
+    lat: -y / App.squadMap.mapToGameScale,
+    lng: x / App.squadMap.mapToGameScale,
+  };
+}
+
+/**
  * Calculates the keypad coordinates for a given latlng coordinate, e.g. "A5-3-7"
  * @param lat - latitude coordinate
  * @param lng - longitude coordinate
@@ -844,8 +913,9 @@ export function getKP(lat, lng, precision) {
   let sub4Number = 10 - (sub4Y + 1) * 3;
   sub4Number += Math.floor(x / s4) % 3;
 
+  console.log('precision:', precision);
   if (!precision) {
-    precision = App.minimap.getZoom();
+    precision = App.squadMap.map.getZoom();
   }
 
   // The more the user zoom in, the more precise we display coords under mouse

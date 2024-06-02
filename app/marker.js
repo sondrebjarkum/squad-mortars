@@ -40,7 +40,10 @@ export default class MarkerBase extends L.Marker {
    * @param {L.Marker} marker
    */
   addToMap(marker) {
-    if (this.outOfBounds(marker.getLatLng())) return;
+    console.log('marker.getLatLng():', marker.getLatLng());
+    if (this.outOfBounds(marker.getLatLng())) {
+      // throw new Error('Marker out of bounds');
+    }
     return this.squadMap.addMarker(marker);
   }
 

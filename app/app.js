@@ -1,4 +1,6 @@
 import { Weapons } from './constants/weapons';
+import { getKP, getLatLng } from './helpers/calculations';
+import { gridPositionToLatLng } from './helpers/grid';
 import { SquadMap } from './map';
 import { Mortar } from './mortar';
 import { Target } from './target';
@@ -9,7 +11,7 @@ import { Target } from './target';
 
 class AppBase {
   /** @type {SquadMap} */
-  map;
+  squadMap;
   /** @type {Mortar} */
   mortar;
   /** @type {Target[]} */
@@ -26,11 +28,12 @@ class AppBase {
   }
 
   init() {
-    this.map = new SquadMap({
+    this.squadMap = new SquadMap({
       handleContextMenu: (e) => this.handleContextMenu(e),
       handleDoubleClick: (e) => this.addMarker(e),
       handleMouseOut: () => null,
       handleLayerRemove: (e) => this.handleLayerRemove(e),
+      handleMouseMove: (e) => this.handleMouseMove(e),
     });
   }
 
@@ -40,19 +43,25 @@ class AppBase {
     if (!this.mortar) {
       return this.addMortar(e.latlng);
     }
-
     return this.addTarget(e.latlng);
   }
 
+  addMarkerByGridPosition(gridPosition) {
+    const uppercased = gridPosition.toUpperCase();
+    const latlng = gridPositionToLatLng(uppercased);
+
+    this.addMarker({ latlng });
+  }
+
   addMortar(latlng) {
-    const mortar = new Mortar(latlng, this.map);
+    const mortar = new Mortar(latlng, this.squadMap);
     this.mortar = mortar;
+    this.recalculateTargets();
   }
 
   addTarget(latlng) {
-    const target = new Target(latlng, this.map);
+    const target = new Target(latlng, this.squadMap);
     this.targets.push(target);
-    console.log('this.targets:', this.targets);
   }
 
   handleContextMenu(e) {
@@ -64,11 +73,35 @@ class AppBase {
 
     if (instanceName === 'Mortar') {
       this.mortar = undefined;
+      this.recalculateTargets();
     }
 
     if (instanceName === 'Target') {
       this.targets = this.targets.filter((target) => target.options.id !== id);
     }
+  }
+
+  recalculateTargets() {
+    if (this.targets.length) {
+      for (const target of this.targets) {
+        target.recalculate();
+      }
+    }
+  }
+
+  handleMouseMove(e) {
+    // if no mouse support
+    if (!matchMedia('(pointer:fine)').matches) {
+      return 1;
+    }
+    console.log('--------------');
+    console.log('ACTUAL LATLNG', e.latlng.lat + ' : ' + e.latlng.lng);
+    const KP = getKP(
+      -e.latlng.lat * this.squadMap.mapToGameScale,
+      e.latlng.lng * this.squadMap.mapToGameScale,
+    );
+    console.log('CALUCLATED LATLNG', getLatLng(KP));
+    console.log('KP:', KP);
   }
 }
 

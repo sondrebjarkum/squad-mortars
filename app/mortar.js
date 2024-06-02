@@ -65,7 +65,6 @@ export class Mortar extends MarkerBase {
     };
 
     this.drawCircles();
-
     this.instances.self.on('remove', this._onRemove);
     this.instances.self.on('contextmenu', this.removeSelf);
     this.instances.self.on('drag', this._onDrag);
@@ -91,6 +90,11 @@ export class Mortar extends MarkerBase {
       this.latlng,
       this.miniCircleOptions,
     ).addTo(this.squadMap.map);
+  }
+
+  setCoordinates(latlng) {
+    this.latlng = latlng;
+    this.instances.self.setLatLng(this.latlng);
   }
 
   _onDrag(e) {

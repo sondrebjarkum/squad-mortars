@@ -6,18 +6,21 @@ import { Layers } from './constants/layers';
 export class SquadMap {
   tileSize = 256;
   layer;
+  map;
 
   constructor({
     handleContextMenu,
     handleDoubleClick,
     handleMouseOut,
     handleLayerRemove,
+    handleMouseMove,
   }) {
     this.init(
       handleContextMenu,
       handleDoubleClick,
       handleMouseOut,
       handleLayerRemove,
+      handleMouseMove,
     );
 
     this.gameToMapScale = this.tileSize / this.layer.size;
@@ -48,6 +51,9 @@ export class SquadMap {
     this.map.eachLayer((layer) => this.map.removeLayer(layer));
     this.map.addLayer(tileLayer);
     this.layer = activeLayer;
+
+    this.gameToMapScale = this.tileSize / this.layer.size;
+    this.mapToGameScale = this.layer.size / this.tileSize;
   }
 
   addMarker(marker) {
@@ -59,6 +65,7 @@ export class SquadMap {
     handleDoubleClick,
     handleMouseOut,
     handleLayerRemove,
+    handleMouseMove,
   ) {
     // const activeMap = this.getLayer();
 
@@ -77,7 +84,6 @@ export class SquadMap {
       boxZoom: true,
       fadeAnimation: true,
       zoom: 2,
-      // layers: [tileLayer],
     });
 
     L.control
@@ -90,6 +96,7 @@ export class SquadMap {
     this.map.on('dblclick', handleDoubleClick, this);
     this.map.on('contextmenu', handleContextMenu, this);
     this.map.on('mouseout', handleMouseOut, this);
+    this.map.on('mousemove', handleMouseMove, this);
     this.map.addEventListener('layerremove', handleLayerRemove);
 
     return this.map;
