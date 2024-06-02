@@ -145,7 +145,7 @@ export class Target extends MarkerBase {
     if (this.instances.calcMarker) {
       this.instances.calcMarker
         .setLatLng(this.latlng)
-        .setContent(this.getCalcPopupContent(this.calculations));
+        .setContent(this.getCalcPopupContent());
     } else {
       this.instances.calcMarker = L.popup(this.targetPopupStyle)
         .setLatLng(this.latlng)
@@ -199,10 +199,10 @@ export class Target extends MarkerBase {
     content +=
       "<br><span class='bearingUiCalc'>" + BEARING.toFixed(1) + '° </span>';
 
-    content += "<br><span class='bearingUiCalc'>" + TOF + '</span>';
+    // content += "<br><span class='bearingUiCalc'>" + TOF + '</span>';
 
-    content +=
-      "<br><span class='bearingUiCalc'>" + DIST.toFixed(0) + 'm </span>';
+    // content +=
+    //   "<br><span class='bearingUiCalc'>" + DIST.toFixed(0) + 'm </span>';
 
     document.dispatchEvent(
       new CustomEvent('target-change', {

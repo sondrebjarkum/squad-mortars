@@ -42,8 +42,10 @@ main .container {
   height: 100vh;
 }
 
-.calcPopup,
-.calcPopup2 {
+.calcPopup {
+  font-family: 'Anton', sans-serif;
+  font-weight: 400;
+  font-style: normal;
   margin: 0;
   padding: 0;
   background: transparent;
@@ -51,17 +53,24 @@ main .container {
   box-shadow: none;
   pointer-events: none;
   font-weight: bold;
-  font-size: 0.9em;
+  font-size: 1.1em;
   color: black;
   height: 45px;
+  letter-spacing: 0.1rem;
   .bearingUiCalc {
     font-size: 0.7em;
   }
   .leaflet-popup-tip,
   .leaflet-popup-content-wrapper {
+    font-weight: bolder;
     background: transparent;
     box-shadow: none;
-    color: black;
+    color: white;
+    /* text-shadow: 1px 1px 4px black; */
+  }
+  .leaflet-popup-content-wrapper span {
+    -webkit-text-stroke: 4px black;
+    paint-order: stroke fill;
   }
   .leaflet-popup-content {
     margin: 0;
@@ -80,4 +89,29 @@ main .container {
       text-align: left;
     }
   }
+}
+
+.kpPopup {
+  background: transparent;
+  pointer-events: none;
+}
+.kpPopup .leaflet-popup-tip,
+.kpPopup .leaflet-popup-content-wrapper {
+  user-select: none;
+  font-family: Arial, Times, 'Times New Roman', serif;
+  font-weight: bold;
+  font-size: 1.6em;
+  background: transparent;
+  box-shadow: none;
+  color: #f6f1f1; /* Random color for mainTxtColor */
+  height: 2em;
+  padding: 0;
+  text-align: center;
+  text-shadow: 2px 2px 0px black;
+}
+.kpPopup .leaflet-popup-tip {
+  display: none;
+}
+.kpPopup.leaflet-popup {
+  transition: none;
 }

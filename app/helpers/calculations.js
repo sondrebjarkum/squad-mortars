@@ -854,10 +854,10 @@ export function getLatLng(keypad) {
  * @param precision - wanted precision (optionnal)
  * @returns {string} keypad coordinates as string
  */
-export function getKP(lat, lng, precision) {
+export function getKP({ lat, lng }, precision) {
   // to minimize confusion
-  const x = lng;
-  const y = lat;
+  const x = lng * App.squadMap.mapToGameScale;
+  const y = -lat * App.squadMap.mapToGameScale;
 
   if (x < 0 || y < 0) {
     return 'XXX-X-X'; // when outside of min bounds

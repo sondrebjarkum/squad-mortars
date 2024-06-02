@@ -1,6 +1,6 @@
 import { Weapons } from './constants/weapons';
 import { getKP, getLatLng } from './helpers/calculations';
-import { gridPositionToLatLng } from './helpers/grid';
+import { getGridCoordinates, gridPositionToLatLng } from './helpers/grid';
 import { SquadMap } from './map';
 import { Mortar } from './mortar';
 import { Target } from './target';
@@ -96,10 +96,7 @@ class AppBase {
     }
     console.log('--------------');
     console.log('ACTUAL LATLNG', e.latlng.lat + ' : ' + e.latlng.lng);
-    const KP = getKP(
-      -e.latlng.lat * this.squadMap.mapToGameScale,
-      e.latlng.lng * this.squadMap.mapToGameScale,
-    );
+    const KP = getKP(e.latlng);
     console.log('CALUCLATED LATLNG', getLatLng(KP));
     console.log('KP:', KP);
   }

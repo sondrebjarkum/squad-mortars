@@ -38,7 +38,7 @@ export class Mortar extends MarkerBase {
         App.config.activeWeapon.getMaxDistance() * this.squadMap.gameToMapScale,
       opacity: 0.7,
       color: '#00137f',
-      fillOpacity: 0,
+      fillOpacity: 0.03,
       weight: 2,
       autoPan: false,
       // className: cursorClass,
@@ -116,7 +116,7 @@ export class Mortar extends MarkerBase {
     );
   }
 
-  _onRemove(e) {
+  _onRemove() {
     document.dispatchEvent(
       new CustomEvent('mortarremoved', { detail: { id: this.id } }),
     );
